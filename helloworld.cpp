@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
 
-typedef std::vector<std::pair<std::string, int>> pairlist_t;
+typedef std::vector<std::pair<std::string, int>> pairlist_t; // Aliases
+using inteiros = int; // More switable for templates
 
 namespace first {
     int x = 50;
