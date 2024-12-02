@@ -4,19 +4,25 @@
 #include <sstream>
 #include <vector>
 
-std::string splitWs(std::string parametro){
+std::string removeRepeatedWs(std::string parametro){
     std::string placeHolder;
     bool foundSpace = false;
-    for (size_t i = 0; i < parametro.size(); i++) {
-        if (parametro[i] == ' ' && !foundSpace) {
-            foundSpace = true;
-        } else if (!foundSpace) {
+    for (size_t i = 0; i < parametro.size(); i++){
+        if (!foundSpace)
+        {
             placeHolder += parametro[i];
         }
+        if (parametro[i+1] == ' ' && parametro[i+2] == ' ')
+        {
+            foundSpace = true;
+        } else {
+            foundSpace = false;
+        }      
     }
 
     return placeHolder;
 }
+
 int main()
 {
     int correct = 8;
@@ -27,12 +33,12 @@ int main()
     std::cout << "What is your name?: ";
     std::string name;
     std::getline(std::cin >> std::ws, name); // Reads and comports ws, but treats as final input to the buffer
-
+    name = removeRepeatedWs(name);
     std::cout << "What is your Age?: ";
     std::string age;
     for (;;)
     { 
-        std::getline(std::cin >> std::ws,  age);
+        std::cin >> age;
         if (std::cin.fail())
         {
             std::cout << "Invalid input, please enter a valid value.\n";
@@ -41,13 +47,12 @@ int main()
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         } else {
-            age = splitWs(age);
             break;
         }
     }
 
     std::cout << "What is your Level?: ";
-    int level;
+    std::string level;
     for (;;)
     {
         std::cin >> level;
@@ -59,7 +64,6 @@ int main()
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         } else {
-            age = splitWs(age);
             break;
         }
     }
