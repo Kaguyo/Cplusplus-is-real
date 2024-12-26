@@ -10,8 +10,13 @@ namespace first {
 }
 namespace secondUniverse {
     std::string vegetaName = "Vegeta Alt";
+    int funcaoAleatoria(int parametro1, int parametro2)
+    {
+        return parametro1 + parametro2;
+    }
 }
-int main(){
+int main()
+{
     using namespace secondUniverse;
 //  using namespace std  => alternative to not precede std statements with std::
 //  !!   std has over 100 entities or so, def gonna conflict in bigger programs.
@@ -28,7 +33,17 @@ int main(){
     std::cout << X << '\n' << X << std::endl;
     std::cout << name << '\n';
     std::cout << Z << '\n';
-    std::cout << vegetaName;
+    std::cout << vegetaName << '\n';
+
+    float array[] = {1, 2, 3};
+    
+    for (size_t i = 0; i < sizeof(array); i+= 4)
+    
+    std::cout << vegetaName + ' ' + name << '\n';
+    int aleatorio = funcaoAleatoria(1, 2);
+    std::cout << aleatorio;
 
     return 0;
+
 }
+

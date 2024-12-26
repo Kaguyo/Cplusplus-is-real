@@ -1,28 +1,54 @@
 #include <iostream>
 #include <string>
-#include <limits>
-#include <sstream>
 #include <vector>
-
-std::string removeRepeatedWs(std::string parametro){
+#include <cstdlib>
+#include <limits>
+std::string removeRepeatedWs(std::string textoParametro)
+{
     std::string placeHolder;
     bool foundSpace = false;
-    for (size_t i = 0; i < parametro.size(); i++){
+    for (size_t i = 0; i < textoParametro.size(); i++)
+    {
         if (!foundSpace)
         {
-            placeHolder += parametro[i];
+            placeHolder += textoParametro[i];
         }
-        if (parametro[i+1] == ' ' && parametro[i+2] == ' ')
+        if (textoParametro[i+1] == ' ' && textoParametro[i+2] == ' ')
         {
             foundSpace = true;
-        } else {
+        } 
+        else 
+        {
             foundSpace = false;
         }      
+    }
+    while (placeHolder[placeHolder.size() -1] == ' ')
+    {
+        std::string treatPlaceHolder;
+        for (size_t i = 0; i < placeHolder.size() - 1; i++)
+        {
+            if (placeHolder[i] != ' ')
+            treatPlaceHolder += placeHolder[i];
+        }
+        placeHolder = treatPlaceHolder;
     }
 
     return placeHolder;
 }
 
+std::string removeRepeatedWs(std::string textoParametro, bool isNumber)
+{
+    if (!isNumber)
+    {
+        removeRepeatedWs(textoParametro);
+    }
+    else 
+    {
+        
+    }
+
+    return textoParametro;
+}
 int main()
 {
     int correct = 8;
@@ -38,7 +64,7 @@ int main()
     std::string age;
     for (;;)
     { 
-        std::cin >> age;
+        std::getline(std::cin >> std::ws, age);
         if (std::cin.fail())
         {
             std::cout << "Invalid input, please enter a valid value.\n";
@@ -63,7 +89,9 @@ int main()
             
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        } else {
+        } 
+        else 
+        {
             break;
         }
     }
