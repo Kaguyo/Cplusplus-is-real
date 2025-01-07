@@ -14,7 +14,6 @@ std::string ExplainTransformation(std::string NomeDaForma, int poderLuta){
     string transformationName;
     string explainedTransformation;
 
-    std::tolower();
     if (NomeDaForma == "Kaioken"){
         transformationName = "Kaioken";
         explainedTransformation = "Aumenta o poder de luta da forma base x2";
