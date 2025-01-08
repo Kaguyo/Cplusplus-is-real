@@ -4,15 +4,7 @@
 #include <iostream>
 #include <cstdlib>
 
-int main() 
-{
-    // Create the window
-    sf::RenderWindow window(sf::VideoMode({800, 600}, 24), "SFML Particle Simulation");
-
-    // Set the frame rate limit (optional)
-    window.setFramerateLimit(120);
-
-    // new second option for events processing via: sf::Window::handleEvents
+// new second option for events processing via: sf::Window::handleEvents
     // const auto onClose = [&window](const sf::Event::Closed&)
     // {
     //     window.close();
@@ -22,6 +14,19 @@ int main()
     //     if (keyPressed.scancode == sf::Keyboard::Scancode::Escape)
     //         window.close();
     // };
+
+int main() 
+{
+    // Create the window
+    sf::RenderWindow window(sf::VideoMode({800, 600}, 24), "SFML Particle Simulation");
+    /*  sf::RenderWindow:: nomeDaWindow(sf::VideoMode::getFullscreenModes().at(0), "Title",
+        sf::State::Fullscreen;) 
+        
+        Assim para criar janela full Screen
+    */
+
+    // Set the frame rate limit (optional)
+    window.setFramerateLimit(120);
 
     // Main loop
     while (window.isOpen()) 

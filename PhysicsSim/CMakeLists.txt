@@ -8,11 +8,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Set the SFML directory to the root of the SFML folder
-set(SFML_DIR "SFML")
+set(SFML_DIR "C:/Users/Kaguyo/Desktop/C++/PhysicsSim/SFML")
 
 # Manually set SFML include and lib directories
-set(SFML_INCLUDE_DIR "${SFML_DIR}/include")
-set(SFML_LIB_DIR "${SFML_DIR}/lib")
+set(SFML_INCLUDE_DIR "C:/Users/Kaguyo/Desktop/C++/PhysicsSim/SFML/include")
+set(SFML_LIB_DIR "C:/Users/Kaguyo/Desktop/C++/PhysicsSim/SFML/lib")
+
 
 # Add the SFML include directory
 include_directories(${SFML_INCLUDE_DIR})
@@ -27,10 +28,15 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 # Link SFML libraries manually (check if these libraries are correct for SFML 3.0)
 target_link_libraries(${PROJECT_NAME} 
-    "${SFML_LIB_DIR}/sfml-graphics-d.lib"
-    "${SFML_LIB_DIR}/sfml-window-d.lib"
-    "${SFML_LIB_DIR}/sfml-system-d.lib"
+    debug ${SFML_LIB_DIR}/libsfml-graphics-d.a
+    debug ${SFML_LIB_DIR}/libsfml-window-d.a
+    debug ${SFML_LIB_DIR}/libsfml-system-d.a
+    optimized ${SFML_LIB_DIR}/libsfml-graphics.a
+    optimized ${SFML_LIB_DIR}/libsfml-window.a
+    optimized ${SFML_LIB_DIR}/libsfml-system.a
 )
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE SFML_STATIC)
 
 # Optionally, you can include the bin folder to find SFML DLLs at runtime (for Windows)
 set(SFML_BIN_DIR "${SFML_DIR}/bin")
