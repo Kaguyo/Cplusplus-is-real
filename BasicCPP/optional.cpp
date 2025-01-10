@@ -39,7 +39,7 @@ int main()
         std::cout << "Valor de Entrada: " << entradaNumber << "\n";
         /* Se trocar has_value() por value() na linha abaixo, causara a excecao std::bad_optional_access
         pois o unico jeito deste if ser atendido é com o optional NAO possuindo valor */
-        std::cout << "Sem valor positivo retornado: " << NumeroOpcional.has_value();
+        std::cout << "Sem valor positivo retornado. has_value() retornou: " << NumeroOpcional.has_value();
         std::cout << "\nTamanho em Bytes do retorno: " << sizeof(NumeroOpcional);
         std::cout << "\nTamanho em Bytes da entrada: " << sizeof(entradaNumber);
     }
