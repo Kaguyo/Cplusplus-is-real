@@ -1,4 +1,10 @@
 *.exe
 *SFML
 *build
+*vs
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.user
+
 
