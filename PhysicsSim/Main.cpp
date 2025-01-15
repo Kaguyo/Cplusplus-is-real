@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 #include <iostream>
 
 /* Diversas keywords de Event::KeyPressed.
@@ -48,16 +49,16 @@ if (const auto* mouseWheelScrolled = event->getIf<sf::Event::MouseWheelScrolled>
 */
 
 int main()
-{   
+{
     unsigned int windowWidth = 1024, windowHeight = 768;
     sf::Vector2<float> axis ((float)windowWidth / 2, (float)windowHeight / 2);
 
     // sf::RenderWindow window(sf::VideoMode::getFullscreenModes().at(0), "Physics Simulation", sf::State::Fullscreen);
     sf::RenderWindow window(sf::VideoMode({ windowWidth, windowHeight }), "Physics Simulation");
     sf::CircleShape circleShape(15.f);
+    // glEnable(GL_TEXTURE_2D);
     circleShape.setFillColor(sf::Color::White);
     circleShape.setPosition(axis);
-    
     sf::Clock clock;
     sf::Time programElapsedTime;
 
@@ -74,7 +75,7 @@ int main()
                 std::cout << "new mouse x: " << mouseMoved->position.x << std::endl;
                 std::cout << "new mouse y: " << mouseMoved->position.y << std::endl;
             }
-            if (event->is<sf::Event::Closed>())
+            else if (event->is<sf::Event::Closed>())
             {
                 window.close();
             }
@@ -90,20 +91,24 @@ int main()
                 windowHeight = Altura;
                 std::cout << windowWidth << "x" << windowHeight << std::endl;
             }
-            if (event->is<sf::Event::FocusLost>())
+            else if (event->is<sf::Event::FocusLost>())
             {
                 // myGame.pause();
             }
-            if (event->is<sf::Event::FocusGained>())
+            else if (event->is<sf::Event::FocusGained>())
             {
                 // myGame.resume();
             }
-            if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
+            else if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
             {
                 if (textEntered->unicode < 128)
                 {
-                    // std::cout << "ASCII character typed: " << static_cast<char>(textEntered->unicode) << std::endl;
+                    std::cout << "ASCII character typed: " << static_cast<char>(textEntered->unicode) << std::endl;
                 }
+            }
+            else if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+            {
+                std::cout << "Disparo!" << std::endl;
             }
         }
 
