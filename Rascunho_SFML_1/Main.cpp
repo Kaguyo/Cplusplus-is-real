@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <thread>
 #include <iostream>
+#include <random>
 
 /*
 Examples for a sphere following the properties below
@@ -25,7 +26,7 @@ public:
     static constexpr float PI = 3.14159f;
 
     Particles(std::string shape, float radius, float weight, unsigned int windowWidth, unsigned int windowHeight,
-              float width = 0.0f, float height = 0.0f, float elasticity = 0.0f)
+              float width, float height, float elasticity = 0.0f)
     {
         this->shape = shape;
         //  ---------------------------------------------------
@@ -107,8 +108,16 @@ public:
     }
 
 private:
+    /* Determines shape of the object. Certain provided shapes (CircleShape, RectangleShape, TriangleShape)
+    will get some of their values like radius, height, width, Cross-sectional area and Drag Coefficient 
+    be auto calculated based on it's shape and n values.
+    In case you don't match the list, your object still is constructed, just wont get all of these auto
+    calculated value */
     std::string shape;
-    bool isStall = false;
+
+    /* Determines whether the object can move on it's axis Y or not.
+    It can if false, otherwisely can't. */
+    bool isStall = false; 
     bool isGoingUp = false;
     float radius = 0.0f;
     float width = 0.0f;
@@ -116,11 +125,11 @@ private:
     float weight = 0.0f;
     float axisX = 0.0f;
     float axisY = 0.0f;
-    float elasticity = 0.0f;    // Coefficient of restitution
-    float velocity = 0.0f;      // Current falling velocity
-    float terminalVelocity = 0.0f;            // Terminal velocity
-    float A = 0.0f;             // Cross-sectional area
-    float Cd = 0.0f;            // Drag coefficient
+    float elasticity = 0.0f;        // Coefficient of restitution. Ex: 0.0 - 1.0
+    float velocity = 0.0f;          // Current falling velocity
+    float terminalVelocity = 0.0f;
+    float A = 0.0f;                 // Cross-sectional area
+    float Cd = 0.0f;                // Drag coefficient
 
     std::optional<float> semiMajorAxis;
     std::optional<float> semiMinorAxis;
@@ -129,8 +138,6 @@ private:
     {
         if (this->shape == "CircleShape")
         {
-            this->axisX = (windowWidth / 2) - this->radius;
-            this->axisY = (windowHeight / 2) - this->radius;
             this->width = this->radius * 2;
             this->height = this->radius * 2;
             this->A = Particles::PI * std::pow(radius / 100.0f, 2); // Divides radius by 100 to get radius to centimeters
@@ -139,20 +146,27 @@ private:
         }
         else if (this->shape == "RectangleShape")
         {
-            this->axisX = (windowWidth / 2) - this->width / 2;
-            this->axisY = (windowHeight / 2) - this->height / 2;
             this->A = (this->width * this->height);
             this->Cd = 0.5f;
             this->terminalVelocity = sqrt((2 * weight * Particles::gravity) / (Particles::airDensity * this->A * this->Cd));
         }
         else if (this->shape == "TriangleShape")
         {
-            this->axisX = (windowWidth / 2) - this->width / 2;
-            this->axisY = (windowHeight / 2) - this->height / 2;
             this->A = (1 / 2) * this->width * this->height;
             this->Cd = 0.5f;
             this->terminalVelocity = sqrt((2 * weight * Particles::gravity) / (Particles::airDensity * this->A * this->Cd));
         }
+
+        // Section below generates random number from 0 up to windowWidth - thisObject.width to simulate collision with the walls
+        int min = 0, max = windowWidth - this->width;
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> distrib(min, max);
+        
+        // Section below generates axisX based on random number and axisY presetted as user wishes
+        this->axisX = distrib(gen);
+        this->axisY = (windowHeight / 2) - this->height;
+
         this->isStall = false;
         this->isGoingUp = false;
     }
@@ -161,6 +175,8 @@ private:
 bool Particles::reset = false;
 float Particles::gravity = 0.981f;
 float Particles::airDensity = 1.225f;
+bool fullScreenOn = false;
+bool updateScreenState = false;
 
 void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigned int windowHeight)
 {    
@@ -179,6 +195,17 @@ void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigne
     // the rendering loop
     while (window->isOpen())
     {
+        if (fullScreenOn && updateScreenState) 
+        {
+            window->create(sf::VideoMode({ 1920, 1080 }), "OpenGL", sf::Style::Default);
+            updateScreenState = false;
+        }
+        else if (!fullScreenOn && updateScreenState)
+        {
+            window->create(sf::VideoMode({ windowWidth, windowHeight }), "OpenGL", sf::Style::Default);
+            updateScreenState = false;
+        }
+
         if (Particles::reset) 
         {
             particlesArray = Particles::resetValues(particlesArray, windowWidth, windowHeight);
@@ -215,10 +242,10 @@ int main()
 
     // launch the rendering thread
     std::thread thread(&renderingThread, &window, windowWidth, windowHeight);
-
+    bool LAlt = false;
+    bool LCtrl = false;
     while (window.isOpen())
     {
-        // aqui eu pego
         while (const std::optional event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
@@ -231,6 +258,33 @@ int main()
                 {
                     std::cout << "Reseting\n";
                     Particles::reset = true;
+                }
+                else if (keyPressed->scancode == sf::Keyboard::Scan::LAlt) 
+                {
+                    LAlt = true;
+                }
+                else if (keyPressed->scancode == sf::Keyboard::Scan::Enter)
+                {
+                    if (LAlt) 
+                    {   
+                        if (!fullScreenOn)
+                        {
+                            fullScreenOn = true;
+                            updateScreenState = true;
+                        }
+                        else
+                        {
+                            fullScreenOn = false;
+                            updateScreenState = true;
+                        }
+                    }
+                }
+            }
+            else if (const auto* keypressed = event->getIf<sf::Event::KeyReleased>())
+            {
+                if (keypressed->scancode == sf::Keyboard::Scan::LAlt)
+                {
+                    LAlt = false;
                 }
             }
         }
