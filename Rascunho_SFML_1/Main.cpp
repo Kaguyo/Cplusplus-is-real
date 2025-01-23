@@ -17,7 +17,7 @@ Cd = 0.5 (drag coefficient of spheres. may vary)
 terminalVelocity = sqroot( ( 2 * mass(1) * gravity(9.81)) / (( p(1,255) * A(0,0314) * Cd(0.5)
 */
 class Particles
-{   
+{
 public:
     static bool reset;
     static float gravity;
@@ -26,7 +26,7 @@ public:
     static constexpr float PI = 3.14159f;
 
     Particles(std::string shape, float radius, float weight, unsigned int windowWidth, unsigned int windowHeight,
-              float width, float height, float elasticity = 0.0f)
+        float width, float height, float elasticity = 0.0f)
     {
         this->shape = shape;
         //  ---------------------------------------------------
@@ -56,7 +56,7 @@ public:
 
     static std::vector<Particles> resetValues(std::vector<Particles> particlesArray, unsigned int windowWidth, unsigned int windowHeight)
     {
-        for (Particles& particle : particlesArray) 
+        for (Particles& particle : particlesArray)
         {
             particle.velocity = 0.0f;
             particle.setInitialValues(windowWidth, windowHeight);
@@ -67,36 +67,36 @@ public:
 
     static std::vector<Particles> update(std::vector<Particles> particlesArray, float windowWidth, float windowHeight)
     {
-        for (Particles &particle : particlesArray) 
-        {   
+        for (Particles& particle : particlesArray)
+        {
             if (!particle.isGoingUp && !particle.isStall)
             {
                 particle.axisY += particle.velocity; // Updates current particle's axis Y
                 particle.velocity += Particles::gravity * Particles::deltaTime; // Updates current particle's velocity
-               
+
                 if (particle.velocity >= particle.terminalVelocity)
                     particle.velocity = particle.terminalVelocity; // Sets particle's velocity to limit 
 
                 if (particle.axisY >= windowHeight - particle.height)
                 {
                     particle.axisY = windowHeight - particle.height; // Puts particle directly onto the floor
-                    if (particle.velocity <= particle.terminalVelocity * 0.04f)
+                    if (particle.velocity <= particle.terminalVelocity * 0.02f)
                     {
                         particle.isStall = true;
                         particle.velocity = 0.0f;
                         continue;
-                    }                    
+                    }
 
                     particle.isGoingUp = true;
                     particle.velocity *= particle.elasticity;
-                }
+                }                                                         
             }
             else if (particle.isGoingUp && !particle.isStall)
             {
                 particle.axisY -= particle.velocity;
                 particle.velocity -= Particles::gravity * Particles::deltaTime;
 
-                if (particle.velocity <= 0.0f) 
+                if (particle.velocity <= 0.0f)
                 {
                     particle.velocity = 0.0f;
                     particle.isGoingUp = false;
@@ -109,7 +109,7 @@ public:
 
 private:
     /* Determines shape of the object. Certain provided shapes (CircleShape, RectangleShape, TriangleShape)
-    will get some of their values like radius, height, width, Cross-sectional area and Drag Coefficient 
+    will get some of their values like radius, height, width, Cross-sectional area and Drag Coefficient
     be auto calculated based on it's shape and n values.
     In case you don't match the list, your object still is constructed, just wont get all of these auto
     calculated value */
@@ -117,7 +117,7 @@ private:
 
     /* Determines whether the object can move on it's axis Y or not.
     It can if false, otherwisely can't. */
-    bool isStall = false; 
+    bool isStall = false;
     bool isGoingUp = false;
     float radius = 0.0f;
     float width = 0.0f;
@@ -162,7 +162,7 @@ private:
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distrib(min, max);
-        
+
         // Section below generates axisX based on random number and axisY presetted as user wishes
         this->axisX = distrib(gen);
         this->axisY = (windowHeight / 2) - this->height;
@@ -175,38 +175,30 @@ private:
 bool Particles::reset = false;
 float Particles::gravity = 0.981f;
 float Particles::airDensity = 1.225f;
-bool fullScreenOn = false;
-bool updateScreenState = false;
 
 void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigned int windowHeight)
-{    
+{
     // activate the window's context
     window->setActive(true);
-
     std::vector<Particles> particlesArray;
-    particlesArray.emplace_back("CircleShape", 15.0f, 1.7f, windowWidth, windowHeight, 0.f, 0.f, 0.6f);
-    
-    sf::CircleShape circleShape(particlesArray[0].getRadius());
-    sf::Vector2<float> position(particlesArray[0].getAxisX(), particlesArray[0].getAxisY());
-    
-    circleShape.setFillColor(sf::Color::White);
-    circleShape.setPosition(position);
+    std::vector<sf::CircleShape> circleShapeArray;
+
+    unsigned int desiredSpheresAmount = 30;
+    sf::Vector2<float> position;
+    for (int i = 0; i < desiredSpheresAmount; i++)
+    {
+        particlesArray.emplace_back("CircleShape", 15.0f, 1.7f, windowWidth, windowHeight, 0.f, 0.f, 0.6f);
+        circleShapeArray.emplace_back(particlesArray[i].getRadius());
+        circleShapeArray[i].setFillColor(sf::Color::White);
+        position.x = particlesArray[i].getAxisX();
+        position.y = particlesArray[i].getAxisY();
+        circleShapeArray[i].setPosition(position);
+    }
 
     // the rendering loop
     while (window->isOpen())
     {
-        if (fullScreenOn && updateScreenState) 
-        {
-            window->create(sf::VideoMode({ 1920, 1080 }), "OpenGL", sf::Style::Default);
-            updateScreenState = false;
-        }
-        else if (!fullScreenOn && updateScreenState)
-        {
-            window->create(sf::VideoMode({ windowWidth, windowHeight }), "OpenGL", sf::Style::Default);
-            updateScreenState = false;
-        }
-
-        if (Particles::reset) 
+        if (Particles::reset)
         {
             particlesArray = Particles::resetValues(particlesArray, windowWidth, windowHeight);
             Particles::reset = false;
@@ -215,21 +207,29 @@ void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigne
         // clear...
         window->clear();
         // draw...
-        window->draw(circleShape);
+        for (sf::CircleShape& shape : circleShapeArray)
+        {
+            window->draw(shape);
+        }
+
         // end the current frame
         window->display();
+
         // update...
         particlesArray = Particles::update(particlesArray, windowWidth, windowHeight);
-        position.x = particlesArray[0].getAxisX();
-        position.y = particlesArray[0].getAxisY();
-
-        circleShape.setPosition(position);
+        for (int i = 0; i < desiredSpheresAmount; i++)
+        {
+            position.x = particlesArray[i].getAxisX();
+            position.y = particlesArray[i].getAxisY();
+            circleShapeArray[i].setPosition(position);
+        }
+        
     }
 }
 
 int main()
 {
-    unsigned int windowWidth = 800, windowHeight = 800;
+    unsigned int windowWidth = 1440, windowHeight = 800;
 
     // create the window
     sf::RenderWindow window(sf::VideoMode({ windowWidth, windowHeight }), "OpenGL", sf::Style::Default);
@@ -258,33 +258,6 @@ int main()
                 {
                     std::cout << "Reseting\n";
                     Particles::reset = true;
-                }
-                else if (keyPressed->scancode == sf::Keyboard::Scan::LAlt) 
-                {
-                    LAlt = true;
-                }
-                else if (keyPressed->scancode == sf::Keyboard::Scan::Enter)
-                {
-                    if (LAlt) 
-                    {   
-                        if (!fullScreenOn)
-                        {
-                            fullScreenOn = true;
-                            updateScreenState = true;
-                        }
-                        else
-                        {
-                            fullScreenOn = false;
-                            updateScreenState = true;
-                        }
-                    }
-                }
-            }
-            else if (const auto* keypressed = event->getIf<sf::Event::KeyReleased>())
-            {
-                if (keypressed->scancode == sf::Keyboard::Scan::LAlt)
-                {
-                    LAlt = false;
                 }
             }
         }
