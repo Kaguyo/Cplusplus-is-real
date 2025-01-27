@@ -89,7 +89,7 @@ public:
 
                     particle.isGoingUp = true;
                     particle.velocity *= particle.elasticity;
-                }                                                         
+                }
             }
             else if (particle.isGoingUp && !particle.isStall)
             {
@@ -178,12 +178,28 @@ float Particles::airDensity = 1.225f;
 
 void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigned int windowHeight)
 {
-    // activate the window's context
+    // Declaring needed Prototypes...
+    sf::RectangleShape setInterfaceSideBarSettings(sf::RectangleShape, sf::Vector2f);
+    sf::RectangleShape createsInterfaceButtons(sf::Vector2f buttonSize, sf::RectangleShape optionalRelativeShape);
+
     window->setActive(true);
+
+    // Creating Particles objects array and CircleShape instances array
     std::vector<Particles> particlesArray;
     std::vector<sf::CircleShape> circleShapeArray;
 
+    // Creating interface Side bar...
+    sf::RectangleShape interfaceMainBar;
+    sf::Vector2f interfaceMainBarSize = { 400.0f, (float)windowWidth };
+    interfaceMainBar = setInterfaceSideBarSettings(interfaceMainBar, interfaceMainBarSize);
+
+    // Creating interface Side bar's button...
+    sf::RectangleShape button = createsInterfaceButtons({ 100.f, 50.f }, interfaceMainBar);
+
+
+    // it does what it says...
     unsigned int desiredSpheresAmount = 30;
+
     sf::Vector2<float> position;
     for (int i = 0; i < desiredSpheresAmount; i++)
     {
@@ -212,6 +228,8 @@ void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigne
             window->draw(shape);
         }
 
+        window->draw(interfaceMainBar);
+        window->draw(button);
         // end the current frame
         window->display();
 
@@ -223,8 +241,34 @@ void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigne
             position.y = particlesArray[i].getAxisY();
             circleShapeArray[i].setPosition(position);
         }
-        
+
     }
+}
+
+/* Method that updates and returns RectangleShape passed through parameter */
+sf::RectangleShape setInterfaceSideBarSettings(sf::RectangleShape interfaceMainBar, sf::Vector2f interfaceMainBarSize)
+{
+    interfaceMainBar.setSize(interfaceMainBarSize);
+    interfaceMainBar.setFillColor(sf::Color::Magenta);
+
+    return interfaceMainBar;
+}
+
+sf::RectangleShape createsInterfaceButtons(sf::Vector2f buttonSize, sf::RectangleShape optionalRelativeShape)
+{
+    sf::RectangleShape button;
+    button.setSize(buttonSize);
+
+    button.setOrigin({ buttonSize.x, buttonSize.y });
+
+    sf::Vector2<float> position;
+    position.x = optionalRelativeShape.getSize().x / 2;
+    position.y = optionalRelativeShape.getSize().y / 4;
+
+    button.setPosition(position);
+    button.setFillColor(sf::Color::White);
+
+    return button;
 }
 
 int main()
