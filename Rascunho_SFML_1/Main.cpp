@@ -3,6 +3,17 @@
 #include <iostream>
 #include <random>
 
+class InterfaceElement
+{
+public:
+    static std::vector<sf::RectangleShape> interfaceButtonsArray;
+    sf::RectangleShape button;
+
+    InterfaceElement(sf::RectangleShape button)
+    {
+        this->button = button;  
+    }
+};
 /*
 Examples for a sphere following the properties below
 radius = 10 (in centimeters)
@@ -175,18 +186,22 @@ private:
 bool Particles::reset = false;
 float Particles::gravity = 0.981f;
 float Particles::airDensity = 1.225f;
+std::vector<sf::RectangleShape> InterfaceElement::interfaceButtonsArray;
+
 
 void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigned int windowHeight)
 {
     // Declaring needed Prototypes...
     sf::RectangleShape setInterfaceSideBarSettings(sf::RectangleShape, sf::Vector2f);
-    sf::RectangleShape createsInterfaceButtons(sf::Vector2f buttonSize, sf::RectangleShape optionalRelativeShape);
+    std::vector<sf::Text> createsInterfaceButtons(sf::Vector2f, sf::RectangleShape, std::string, std::vector<sf::Text>);
 
     window->setActive(true);
 
-    // Creating Particles objects array and CircleShape instances array
+    // Creating Particles objects array, CircleShape instances array
+    // InterfaceElements Text array
     std::vector<Particles> particlesArray;
     std::vector<sf::CircleShape> circleShapeArray;
+    std::vector<sf::Text> textLabelsArray;
 
     // Creating interface Side bar...
     sf::RectangleShape interfaceMainBar;
@@ -194,7 +209,7 @@ void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigne
     interfaceMainBar = setInterfaceSideBarSettings(interfaceMainBar, interfaceMainBarSize);
 
     // Creating interface Side bar's button...
-    sf::RectangleShape button = createsInterfaceButtons({ 100.f, 50.f }, interfaceMainBar);
+    textLabelsArray = createsInterfaceButtons({ 100.f, 50.f }, interfaceMainBar, "Aez", textLabelsArray);
 
 
     // it does what it says...
@@ -229,7 +244,16 @@ void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigne
         }
 
         window->draw(interfaceMainBar);
-        window->draw(button);
+        for (InterfaceElement element : InterfaceElement::interfaceButtonsArray) 
+        {
+            window->draw(element.button);
+        }
+
+        for (sf::Text text : textLabelsArray) 
+        {
+            window->draw(text);
+        }
+
         // end the current frame
         window->display();
 
@@ -254,21 +278,31 @@ sf::RectangleShape setInterfaceSideBarSettings(sf::RectangleShape interfaceMainB
     return interfaceMainBar;
 }
 
-sf::RectangleShape createsInterfaceButtons(sf::Vector2f buttonSize, sf::RectangleShape optionalRelativeShape)
+std::vector<sf::Text> createsInterfaceButtons(sf::Vector2f buttonSize, sf::RectangleShape optionalRelativeShape, std::string buttonLabel,
+    std::vector<sf::Text> textLabelsArray)
 {
     sf::RectangleShape button;
     button.setSize(buttonSize);
 
-    button.setOrigin({ buttonSize.x, buttonSize.y });
-
     sf::Vector2<float> position;
-    position.x = optionalRelativeShape.getSize().x / 2;
-    position.y = optionalRelativeShape.getSize().y / 4;
+    position.x = optionalRelativeShape.getSize().x / 4;
+    position.y = 160;
 
     button.setPosition(position);
     button.setFillColor(sf::Color::White);
 
-    return button;
+    sf::Font font("C:\\Windows\\Fonts\\Arial.ttf");
+
+    sf::Text text(font);
+    text.setString(buttonLabel);
+    text.setFillColor(sf::Color::Black);
+    text.setCharacterSize(12);
+    text.setPosition(button.getPosition());
+    textLabelsArray.push_back(text);
+
+    InterfaceElement::interfaceButtonsArray.emplace_back(button);
+
+    return textLabelsArray;
 }
 
 int main()
