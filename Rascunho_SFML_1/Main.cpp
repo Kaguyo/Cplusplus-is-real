@@ -18,9 +18,9 @@ public:
 Examples for a sphere following the properties below
 radius = 10 (in centimeters)
 m = 1 (in kg)
-g = 9.81m/s² (gravity for Earth)
-p = 1,225kg / m³ (air density usually)
-A (for Spheres) = pi * (radius in meters)² ->Result is in square meters 0,0314(m²)
+g = 9.81m/s (gravity for Earth)
+p = 1,225kg / m (air density usually)
+A (for Spheres) = pi * (radius in meters) ->Result is in square meters 0,0314(m)
 A (for Rectangles) = width * height
 A (for Elipses) = pi * semi-major axis * semi-minor axis
 A (for Triangles) = (1 / 2) * base * height
@@ -210,7 +210,7 @@ void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigne
 
     // Creating interface Side bar's button...
     textLabelsArray = createsInterfaceButtons({ 100.f, 50.f }, interfaceMainBar, "Aez", textLabelsArray);
-
+    
 
     // it does what it says...
     unsigned int desiredSpheresAmount = 30;
@@ -244,6 +244,7 @@ void renderingThread(sf::RenderWindow* window, unsigned int windowWidth, unsigne
         }
 
         window->draw(interfaceMainBar);
+
         for (InterfaceElement element : InterfaceElement::interfaceButtonsArray) 
         {
             window->draw(element.button);
@@ -298,7 +299,9 @@ std::vector<sf::Text> createsInterfaceButtons(sf::Vector2f buttonSize, sf::Recta
     text.setFillColor(sf::Color::Black);
     text.setCharacterSize(12);
     text.setPosition(button.getPosition());
+    std::cout << textLabelsArray.size();
     textLabelsArray.push_back(text);
+    std::cout << textLabelsArray.size();
 
     InterfaceElement::interfaceButtonsArray.emplace_back(button);
 
